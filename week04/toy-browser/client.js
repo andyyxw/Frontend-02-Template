@@ -1,6 +1,5 @@
 const net = require("net");
 const parser = require("./parser.js");
-// const parser = require("./parser2.js");
 
 class Request {
   constructor(options) {
