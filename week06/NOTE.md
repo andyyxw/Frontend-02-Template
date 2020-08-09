@@ -1,1 +1,99 @@
 学习笔记
+
+## CSS总体结构
+
+- @rules
+  - @charset
+  - @import
+  - **@media**
+  - @page
+  - @counter-style
+  - **@keyframes**
+  - **@fontface**
+  - @support
+  - @namespace
+- rule
+  - Selector
+    - Selector_group
+    - selector
+      - `>`
+      - `<sp>`
+      - `+`
+      - `~`
+    - simple_selector
+      - `type`
+      - `*`
+      - `.`
+      - `#`
+      - `:`
+      - `::`
+      - `:not()`
+  - Declaration
+    - Key
+      - variables
+      - properties
+    - Value
+      - calc
+      - number
+      - length
+      - ......
+
+## CSS选择器
+
+- 简单选择器
+  - *
+  - div svg|a
+  - .class
+  - #id
+  - [attr=value]
+  - :hover
+  - ::before
+- 复合选择器
+  - <简单选择器><简单选择器><简单选择器>
+  - `*` 或者 div 必须写在最前面
+- 复杂选择器
+  - <复合选择器><sp><复合选择器>
+  - <复合选择器>">"<复合选择器>
+  - <复合选择器>"~"<复合选择器>
+  - <复合选择器>"+"<复合选择器>
+  - <复合选择器>"||"<复合选择器>
+- 伪类
+  - 链接/行为
+    - :any-link
+    - :link :visited
+    - :hover
+    - :active
+    - :focus
+    - :target
+  - 树结构
+    - :empty
+    - :nth-child()
+    - :nth-last-child()
+    - :first-child :last-child :only-child
+  - 逻辑型
+    - :not伪类
+    - :where :has
+- 伪元素
+  - ::before
+  - ::after
+  - ::first-line
+    - font系列
+    - color系列
+    - background系列
+    - word-spacing
+    - letter-spacing
+    - text-decoration
+    - text-transform
+    - ling-height
+  - ::first-letter
+    - font系列
+    - color系列
+    - background系列
+    - word-spacing
+    - letter-spacing
+    - text-decoration
+    - text-transform
+    - ling-height
+    - float
+    - vertical-align
+    - 盒模型系列：margin, padding, border

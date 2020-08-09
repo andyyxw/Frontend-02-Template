@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    <div class="container" id="app"></div>
+  </div>  
+
+  <script>
+    // 判定选择器类型
+    function isClass (s) {
+      return s.includes('.')
+    }
+    function isId (s) {
+      return s.includes('#')
+    }
+    function classify (s) {
+      return isClass(s) ? 'className' : (isId(s) ? 'id' : 'tag')
+    }
+
+    // 取到对应选择器的值， 去除干扰元素(eg: . #)
+    const handlerMap = {
+      className: (v) => v.slice(1),
+      id: (v) => v.slice(1),
+      tag: (v) => v
+    }
+
+    function handlerFn (type) {
+      return handlerMap[type]
+    }
+
+    // 正则解析selector字符串
+    function parseStr (s) {
+      const arr = s.match(/([#.][0-9a-zA-Z-_]+)/g)
+      return Array.isArray(arr) ? arr
+        .map(i => ({ type: classify(i), value: i }))
+        .map(({ type, value }) => ({ type, value: handlerFn(type)(value) })) : [{
+        type: 'tag',
+        value: s
+      }]
+    }
+
+    // 根据空格解析selector字符串， 但是我没有支持复杂情况（ > ~ + ||）
+    function parserSelector (str) {
+      return str.split(' ').map(s => parseStr(s))
+    }
+
+    // 从dome取到对应的信息
+    function parseDom (dom) {
+      return {
+        tag: dom.tagName.toLocaleLowerCase(),
+        className: dom.className,
+        id: dom.id
+      }
+    }
+
+    function compare (selector, domProps) {
+      return selector.every(({ type, value }) => domProps[type] ? domProps[type] === value : false)
+    }
+
+    function match (selector, element) {
+      // 解析选择器， 返回的结构为
+      // [[{type, value}], ...]
+      var currentDom = element
+      var result = false
+      var isFirst = true
+      const arr = parserSelector(selector)
+      var topSelector = arr.pop() // arr
+
+      while (topSelector || !currentDom) {
+        result = compare(topSelector, parseDom(currentDom))
+        if (isFirst && !result) break
+        isFirst = false
+        currentDom = currentDom.parentNode
+        topSelector = arr.pop()
+      }
+
+      return result
+    }
+
+    console.log(match('div #app.container', document.querySelector('#app')))
+  </script>
+</body>
+</html>
