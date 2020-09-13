@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>使用Range实现DOM精确操作 | 正常流里的拖拽</title>
+</head>
+
+<body>
+  <div id="container">文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+    文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+    文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+    文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+  </div>
+  <div id="dragable" style="display: inline-block; width: 100px; height: 100px; background-color: pink;"></div>
+</body>
+<script>
+  const dragable = document.getElementById('dragable')
+  let baseX = 0
+  let baseY = 0
+  dragable.addEventListener('mousedown', event => {
+    const startX = event.clientX
+    const startY = event.clientY
+
+    function up (e) {
+      baseX = baseX + e.clientX - startX
+      baseY = baseY + e.clientY - startY
+      document.removeEventListener('mousemove', move)
+      document.removeEventListener('mouseup', up)
+    }
+
+    function move (e) {
+      const range = getNearest(e.clientX, e.clientY)
+      range.insertNode(dragable)
+  
+      // dragable.style.transform = `translate(${e.clientX - startX + baseX}px, ${e.clientY - startY + baseY}px)`
+    }
+
+    document.addEventListener('mousemove', move)
+    document.addEventListener('mouseup', up)
+  })
+
+  const ranges = []
+  const container = document.getElementById('container')
+
+  for (let i = 0; i < container.childNodes[0].textContent.length; i++) {
+    const range = document.createRange()
+    range.setStart(container.childNodes[0], i)
+    range.setEnd(container.childNodes[0], i)
+    // 获取节点位置
+    console.log(range.getBoundingClientRect())
+    ranges.push(range)
+  }
+
+  function getNearest (x, y) {
+    let min = Infinity
+    let nearest = null
+    for (const range of ranges) {
+      const react = range.getBoundingClientRect()
+      const distance = (react.x - x) ** 2 + (react.y - y) ** 2
+      if (distance < min) {
+        nearest = range
+        min = distance
+      }
+    }
+    return nearest
+  }
+
+  document.addEventListener('selectstart', e => { e.preventDefault() })
+</script>
+
+</html>
