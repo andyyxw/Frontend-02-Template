@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>proxy与双向绑定 | 实现reactive</title>
+</head>
+
+<body>
+
+</body>
+<script>
+  const callbacks = new Map()
+  const reativities = new Map()
+  let usedReactivties = []
+
+  const object = {
+    a: { aa: 3 },
+    b: 2
+  }
+
+  const po = reactive(object)
+
+  effect(() => {
+    console.log('effect', po.a.aa)
+  })
+
+  function reactive (object) {
+    if (reativities.has(object)) { return reativities.get(object) }
+    const proxy = new Proxy(object, {
+      set (obj, prop, val) {
+        obj[prop] = val
+
+        if (callbacks.get(obj)) {
+          if (callbacks.get(obj).get(prop)) {
+            for (const callback of callbacks.get(obj).get(prop)) {
+              callback()
+            }
+          }
+        }
+        return obj[prop]
+      },
+      get (obj, prop) {
+        usedReactivties.push([obj, prop])
+
+        if (typeof obj[prop] === 'object') { return reactive(obj[prop]) }
+
+        return obj[prop]
+      }
+    })
+    reativities.set(object, proxy)
+    return proxy
+  }
+
+  function effect (callback) {
+    usedReactivties = []
+    callback()
+    console.log('usedReactivties', usedReactivties)
+
+    for (const reactivity of usedReactivties) {
+      if (!callbacks.has(reactivity[0])) {
+        callbacks.set(reactivity[0], new Map())
+      }
+      if (!callbacks.get(reactivity[0]).has(reactivity[0])) {
+        callbacks.get(reactivity[0]).set(reactivity[1], [])
+      }
+      callbacks.get(reactivity[0]).get(reactivity[1]).push(callback)
+    }
+  }
+</script>
+
+</html>
